@@ -44,7 +44,6 @@ public class Scanner {
 			head++;
 		}
 		if(isAlpha(ch)){
-			//System.out.print(ch);
 			sb.append(ch);
 			ch = getchar();
 			while(isAlnum(ch)){
