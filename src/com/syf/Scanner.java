@@ -29,7 +29,7 @@ public class Scanner {
 	public boolean isAlnum(char ch){
 		return isAlpha(ch) || isDigit(ch);
 	}
-	
+	// 哈哈哈哈
 	public Token token_scan(){
 		StringBuilder sb = new StringBuilder();
 		if(tail == buffer.size())
