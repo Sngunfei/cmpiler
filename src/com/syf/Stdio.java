@@ -2,6 +2,14 @@ package com.syf;
 import java.io.*;
 import java.util.*;
 
+/**
+* @file Stdio.java
+* @CopyRight (C) https://github.com/Sngunfei
+* @author syfnico
+* @email syfnico@foxmail.com
+* @date 2018-3-31
+*/
+
 public class Stdio {
 	
 	private ArrayList<Character> buffer = new ArrayList<Character>();
@@ -12,17 +20,16 @@ public class Stdio {
 	
 	public void readFile(String fileName){
 		FileReader fileInput = null;
-		File file = null;
+		File file;
 		try{
 			file = new File(fileName);
 			if(!file.exists())
 				file.createNewFile();
 			fileInput = new FileReader(file);
 			char[] buffer = new char[4096];
-			int charnum = 0;
-			while((charnum = fileInput.read(buffer))!=-1){
-				//System.out.println(charnum);
-				for(int i=0; i<charnum; i++){
+			int charNum;
+			while((charNum = fileInput.read(buffer))!=-1){
+				for(int i=0; i<charNum; i++){
 					//System.out.print(buffer[i]);
 					this.buffer.add(new Character(buffer[i]));
 				}

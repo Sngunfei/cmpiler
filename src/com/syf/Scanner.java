@@ -2,12 +2,28 @@ package com.syf;
 import java.util.*;
 import java.lang.StringBuilder;
 
+/**
+* @file Scanner.java
+* @CopyRight (C) https://github.com/Sngunfei
+* @brief
+* @author syfnico
+* @email syfnico@foxmail.com
+* @date 2018-3-31
+*/
+
 public class Scanner {
 	
-	private ArrayList<Character> buffer = null;
-	private int head = 0;
+	private ArrayList<Character> buffer;
 	private int tail = 0;
 	private char ch;
+
+	public boolean isEnd(){
+		return tail < buffer.size();
+	}
+
+	public Scanner(ArrayList<Character> buffer){
+		this.buffer = buffer;
+	}
 	
 	public char getchar(){
 		return buffer.get(tail++).charValue();
@@ -29,19 +45,18 @@ public class Scanner {
 	public boolean isAlnum(char ch){
 		return isAlpha(ch) || isDigit(ch);
 	}
-	// 哈哈哈哈
+
 	public Token token_scan(){
 		StringBuilder sb = new StringBuilder();
 		if(tail == buffer.size())
-			return new Token(-1, "####");
+			return null;
 		ch = getchar();
 		if(tail == buffer.size())
-			return new Token(-1, "####");
+			return null;
 		while(ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r'){
 			ch = getchar();
 			if(tail == buffer.size())
-				return new Token(-1, "####");
-			head++;
+				return null;
 		}
 		if(isAlpha(ch)){
 			sb.append(ch);
@@ -51,8 +66,8 @@ public class Scanner {
 				ch = getchar();
 			}
 			retract();
-			String str = sb.toString();
-			return new Token(Const.install_id(str), str);
+			String name = sb.toString();
+			return new Word(name);
 		}else if(isDigit(ch)){
 			sb.append(ch);
 			ch = getchar();
@@ -68,142 +83,138 @@ public class Scanner {
 					ch = getchar();
 				}
 				retract();
-				String str = sb.toString();
-				return new Token(Const.install_unsigned_float(str),str);
+				float num = Float.parseFloat(sb.toString());
+				return new Unsigned_Float(num);
 			}
 			retract();
-			String str = sb.toString();
-			//System.out.println(str);
-			return new Token(Const.install_unsigned_int(str), str);
+			int num = Integer.parseInt(sb.toString());
+			return new Unsigned_Int(num);
 		}else 
 			switch(ch){
 				case '*':sb.append(ch);
 						 ch = getchar();	
 						 if(ch == '*'){
-							 return new Token(Code.EXP.ordinal(), "EXP");
+							 return new Token(Code.EXP.ordinal());
 						 }else if(ch == '='){
-							 return new Token(Code.MULTI_ASSIGN.ordinal(), "MULTI-ASSIGN");
+							 return new Token(Code.MULTI_ASSIGN.ordinal());
 						 }else{
 							 retract();
-							 return new Token(Code.MULTI.ordinal(), "MULTI");
+							 return new Token(Code.MULTI.ordinal());
 						 }
 				case '+':sb.append(ch);
 						 ch = getchar();
 						 if(ch == '+'){
-							 return new Token(Code.INC.ordinal(), "INC");
+							 return new Token(Code.INC.ordinal());
 						 }else if(ch == '='){
-							 return new Token(Code.ADD_ASSGIN.ordinal(), "ADD-ASSIGN");
+							 return new Token(Code.ADD_ASSGIN.ordinal());
 						 }else{
 							 retract();
-							 return new Token(Code.ADD.ordinal(), "ADD");
+							 return new Token(Code.ADD.ordinal());
 						 }
 				case '-':sb.append(ch);
 						 ch = getchar();
 						 if(ch == '-'){
-							 return new Token(Code.DEC.ordinal(), "DEC");
+							 return new Token(Code.DEC.ordinal());
 						 }else if(ch == '='){
-							 return new Token(Code.MINUS_ASSIGN.ordinal(), "MINUS-ASSIGN");
+							 return new Token(Code.MINUS_ASSIGN.ordinal());
 						 }else if(ch == '>'){
-							 return new Token(Code.POINTER.ordinal(), "POINTER");
+							 return new Token(Code.POINTER.ordinal());
 						 }else{
 							 retract();
-							 return new Token(Code.MINUS.ordinal(), "MINUS"); 
+							 return new Token(Code.MINUS.ordinal());
 						 }
 				case '=':sb.append(ch);
 						 ch = getchar();
 						 if(ch == '='){
-							 return new Token(Code.EQ.ordinal(), "EQ");
+							 return new Token(Code.EQ.ordinal());
 						 }else{
 							 retract();
-							 return new Token(Code.ASSIGN.ordinal(), "ASSIGN");
+							 return new Token(Code.ASSIGN.ordinal());
 						 }
 				case '>':sb.append(ch);
 						 ch = getchar();
 						 if(ch == '>'){
-							 return new Token(Code.R_SHIFT.ordinal(), "R-SHITF");
+							 return new Token(Code.R_SHIFT.ordinal());
 						 }else if(ch == '='){
-							 return new Token(Code.GE.ordinal(), "GE");
+							 return new Token(Code.GE.ordinal());
 						 }else{
 							 retract();
-							 return new Token(Code.GT.ordinal(), "GT");
+							 return new Token(Code.GT.ordinal());
 						 }
 				case '<':sb.append(ch);
 						 ch = getchar();
 						 if(ch == '>'){
-							 return new Token(Code.NE.ordinal(),"NE");
+							 return new Token(Code.NE.ordinal());
 						 }else if(ch == '<'){
-							 return new Token(Code.L_SHIFT.ordinal(),"L-SHIFT");
+							 return new Token(Code.L_SHIFT.ordinal());
 						 }else if(ch == '='){ 
-							 return new Token(Code.LE.ordinal(),"LE");
+							 return new Token(Code.LE.ordinal());
 						 }else{
 							 retract();
-							 return new Token(Code.LT.ordinal(),"LT");
+							 return new Token(Code.LT.ordinal());
 						 }
 				case '&':sb.append(ch);
 						 ch = getchar();
 						 if(ch == '&'){
 							 // && 
-							return new Token(Code.ANDAND.ordinal(),"&&");
+							return new Token(Code.ANDAND.ordinal());
 						 }
 						 retract();
-						 return new Token(Code.AND.ordinal(), "&");
+						 return new Token(Code.AND.ordinal());
 				case '|':sb.append(ch);
 						 ch = getchar();
 						 if(ch == '|'){
 							 // ||
-							 return new Token(Code.OROR.ordinal(), "||");
+							 return new Token(Code.OROR.ordinal());
 						 }
 						 retract();
-						 return new Token(Code.OR.ordinal(), "|");
+						 return new Token(Code.OR.ordinal());
 				case '(':sb.append(ch);
-						 return new Token(Code.L_BRACKET.ordinal(), "L-bracket");
+						 return new Token(Code.L_BRACKET.ordinal());
 				case ')':sb.append(ch);
-						 return new Token(Code.R_BRACKET.ordinal(), "R-bracket");
+						 return new Token(Code.R_BRACKET.ordinal());
 				case '{':sb.append(ch);
-						 return new Token(Code.L_BRACE.ordinal(), "L-brace");
+						 return new Token(Code.L_BRACE.ordinal());
 				case '}':sb.append(ch);
-						 return new Token(Code.R_BRACE.ordinal(), "R-brace");
+						 return new Token(Code.R_BRACE.ordinal());
 				case '/':sb.append(ch);
 						 ch = getchar();
 						 if(ch == '='){
-							 return new Token(Code.DIV_ASSIGN.ordinal(), "DIV-ASSIGN");
+							 return new Token(Code.DIV_ASSIGN.ordinal());
 						 }else if(ch == '/'){
-							 // ��ע��
 							 ch = getchar();
 							 while(ch != '\n')
 								 ch = getchar();
-							 return new Token(0, "COMMENT");
+							 return null;
 						 }else if(ch == '*'){
-					  Loop:	 while(true){
-						     ch = getchar();
-							 while(ch != '*')
-								 ch = getchar();
-							 ch = getchar();
-							 if(ch == '/')
-								 return new Token(0, "COMMENT");
-							 else
-								 continue Loop;
+						 	while(true){
+						 		ch = getchar();
+						 		while(ch != '*')
+									ch = getchar();
+						 		ch = getchar();
+						 		if(ch == '/')
+						 			return null;
 							 }
-						 }else{
+						 }else {
 							 retract();
-							 return new Token(Code.DIV.ordinal(), "DIV");
+							 return new Token(Code.DIV.ordinal());
 						 }
-				case ',':sb.append(ch);
-						 return new Token(Code.COMMA.ordinal(), "COMMA");
-				case ':':sb.append(ch);
-						 ch = getchar();
-						 if(ch == '='){
-							 return new Token(Code.ASSIGN.ordinal(), "ASSIGN");
-						 }break;
-				case ';':sb.append(ch);
-						 return new Token(Code.SEMIC.ordinal(), "SEMIC");
-				case '!':sb.append(ch);
-						 return new Token(Code.NOT.ordinal(), "NOT");
 				case '#':sb.append(ch);
 						 ch = getchar();
 						 while(ch != '\n')
-							 ch = getchar();
-						 return new Token(0, "MACRO");
+						 	ch = getchar();
+						 return null;
+				case ',':sb.append(ch);
+						 return new Token(Code.COMMA.ordinal());
+				case ':':sb.append(ch);
+						 ch = getchar();
+						 if(ch == '='){
+							 return new Token(Code.ASSIGN.ordinal());
+						 }break;
+				case ';':sb.append(ch);
+						 return new Token(Code.SEMIC.ordinal());
+				case '!':sb.append(ch);
+						 return new Token(Code.NOT.ordinal());
 				case '"':sb.append(ch);
 						 ch = getchar();
 						 while(ch != '"'){
@@ -211,36 +222,31 @@ public class Scanner {
 							 ch = getchar();
 						 }
 						 sb.append(ch);
-						 String str = sb.toString();
-						 return new Token(Const.install_string(str),str);
+						 String lexme = sb.toString();
+						 return new Const_String(lexme);
 			}
-		return new Token(-1, "ERROR");
+			return null;
 	}
 	
-	public ArrayList<Token> scanner(Stdio scan, String fileName){
-		scan.readFile(fileName);
-		this.buffer = scan.getBuffer();
-		//System.out.println(buffer.size());
-		this.head = this.tail = 0;
-		ArrayList<Token> tokens = new ArrayList<Token>();
-		Token token = token_scan();
-		while(token.getCode() != -1){
-			//System.out.println(token.getSymbol());
-			tokens.add(token);
-			token = token_scan();
-		}
-		return tokens;
-	}
-
-	public static void main(String[] args) {
-		Scanner test = new Scanner();
-		Stdio scan = new Stdio();
-		String fileName = "F:\\123.c";
-		ArrayList<Token> tokens = test.scanner(scan, fileName);
-		for(int i=0; i<tokens.size(); i++){
-			String attr = Const.category[tokens.get(i).getCode()];
-			String str  = "(" + attr + ", " + tokens.get(i).getName() + ")";
-			System.out.println(str);
-		}
-	}
+//	private ArrayList<Token> scanner(Stdio scan, String fileName){
+//		scan.readFile(fileName);
+//		this.buffer = scan.getBuffer();
+//		//System.out.println(buffer.size());
+//		this.tail = 0;
+//		ArrayList<Token> tokens = new ArrayList<>();
+//		Token token = token_scan();
+//		while(tail < buffer.size()){
+//			//System.out.println(token.getSymbol());
+//			tokens.add(token);
+//			token = token_scan();
+//		}
+//		return tokens;
+//	}
+//
+//	public static void main(String[] args) {
+//		Scanner test = new Scanner();
+//		Stdio scan = new Stdio();
+//		String fileName = "F:\\123.c";
+//		ArrayList<Token> tokens = test.scanner(scan, fileName);
+//	}
 }

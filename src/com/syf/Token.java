@@ -1,32 +1,15 @@
 package com.syf;
 
+/**
+* @file Token.java
+* @CopyRight (C) https://github.com/Sngunfei
+* @brief
+* @author syfnico
+* @email syfnico@foxmail.com
+* @date 2018-3-31
+*/
+
 public class Token {
-	private String name;
-	private int code;
-	private int index;
-	Token(int code, String name){
-		this.name = name;
-		this.code = code;
-	}
-	
-	public String getName(){
-		return this.name;
-	}
-	
-	public int getCode(){
-		return this.code;
-	}
-	
-	public int getIndex(){
-		return this.index;
-	}
-	
-	public void setIndex(int index){
-		this.index = index;
-	}
-	
-	@Override
-	public String toString(){
-		return "("+ code + "," + name + ")";
-	}
+	public final int tag;
+	public Token(int t){ this.tag = t; }
 }
