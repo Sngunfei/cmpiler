@@ -1,19 +1,15 @@
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 public class Main {
 
     public static void main(String[] args) {
-        try{
-            File file = new File("F:\\output.txt");
-            PrintWriter pw = new PrintWriter(file);
-            pw.println("~~~~~~~~~~~~~~~~~~~");
-            pw.flush();
-            pw.close();
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+        ArrayList<String> a = new ArrayList<>();
+        a.add("1");
+        a.add("2");
+        System.out.println(a.toString());
 
 
     }

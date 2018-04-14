@@ -26,7 +26,6 @@ unary_operator ~
 unary_operator !
 cast_expression unary_expression
 cast_expression ( type_name ) cast_expression
-cast_expression
 multiplicative_expression cast_expression
 multiplicative_expression multiplicative_expression * cast_expression
 multiplicative_expression multiplicative_expression / cast_expression
@@ -210,3 +209,4 @@ function_definition declaration_specifiers declarator declaration_list compound_
 function_definition declaration_specifiers declarator compound_statement
 function_definition declarator declaration_list compound_statement
 function_definition declarator compound_statement
+s translation_unit
