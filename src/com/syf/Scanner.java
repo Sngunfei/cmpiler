@@ -18,13 +18,14 @@ public class Scanner {
 	private char ch;
 
 	public boolean isEnd(){
-		return tail < buffer.size();
+		return tail >= buffer.size();
 	}
 
 	Scanner(){
 		Stdio stdio = new Stdio();
-		stdio.readFile("F:\\123.c");
+		stdio.readFile("F:\\123.txt");
 		this.buffer = stdio.getBuffer();
+		this.tail = 0;
 	}
 	
 	private char getchar(){
@@ -51,14 +52,14 @@ public class Scanner {
 	public Token token_scan(){
 		StringBuilder sb = new StringBuilder();
 		if(tail == buffer.size())
-			return null;
+			return new Token("$");
 		ch = getchar();
 		if(tail == buffer.size())
-			return null;
+			return new Token("$");
 		while(ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r'){
 			ch = getchar();
 			if(tail == buffer.size())
-				return null;
+				return new Token("$");
 		}
 		if(isAlpha(ch)){
 			sb.append(ch);
@@ -72,7 +73,7 @@ public class Scanner {
 			//return new Word(name);
 			if(Code.KEYWORD.contains(name))
 				return new Token(name.toUpperCase());
-			return new Token("IDENTIFIER");
+			return new Token(name);
 		}else if(isDigit(ch)){
 			sb.append(ch);
 			ch = getchar();

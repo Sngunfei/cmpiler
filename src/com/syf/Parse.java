@@ -214,7 +214,8 @@ public class Parse {
     private HashMap<String, ArrayList<Production>> classified_production = new HashMap<>();
     private HashMap<String, ArrayList<String>> firstSet = new HashMap<>();
 
-    private Stack<String> stack = new Stack<>();
+    private Stack<Integer> state_stack = new Stack<>();
+    private Stack<String> symbol_stack = new Stack<>();
 
     private String[][] table = new String[2000][200];
 
@@ -226,7 +227,7 @@ public class Parse {
      */
     private void readIn() throws IOException {
         //File file = new File("C:\\Users\\86234\\workspace\\FirstProj\\src\\com\\syf\\Production_table");
-        File file = new File("C:\\Users\\86234\\workspace\\FirstProj\\src\\com\\syf\\sample");
+        File file = new File("C:\\Users\\86234\\workspace\\FirstProj\\src\\com\\syf\\sample2");
         BufferedReader in = new BufferedReader(
                                 new InputStreamReader(
                                         new FileInputStream(file), "UTF-8"));
@@ -248,6 +249,7 @@ public class Parse {
                 }
             }
         }
+        this.productions.add(new Production("S1 E"));
         this.terminals.add("$");
         in.close();
         this.productions.trimToSize();
@@ -300,7 +302,11 @@ public class Parse {
                     continue;
                 // 符号B的后面，即βb
                 ArrayList<String> rightHand = item.getRight();
-                ArrayList<String> tmpFirstSet = this.getFirst(rightHand);
+                ArrayList<String> tmpFirstSet;
+                if(item.getDot() == item.getProduction().getRight().length - 1)
+                    tmpFirstSet = rightHand;
+                else
+                    tmpFirstSet = this.getFirst(rightHand);
              L1:for (Production production : tmpProductions) {
                    // System.out.println(production.toString());
                    // System.out.println(tmpFirstSet.toString());
@@ -343,10 +349,10 @@ public class Parse {
             int dot = item.getDot();
             if(dot == prod.getRight().length)
                 continue;
-            System.out.println(X + " " + item.getTmpSymbol());
+            //System.out.println(X + " " + item.getTmpSymbol());
             if(X.equals(item.getTmpSymbol())){
                 Item newItem = new Item(prod, item.getRightHand(), dot+1);
-                System.out.println(newItem.toString());
+                //System.out.println(newItem.toString());
                 J.add(newItem);
             }
         }
@@ -360,11 +366,12 @@ public class Parse {
      */
     private void items(){
         SetOfItems start = new SetOfItems();
-        Production production = new Production("S1 S");
+        Production production = new Production("S1 E");
         ArrayList<String> right = new ArrayList<>();
         right.add("$");
         Item item = new Item(production, right, 0);
         start.add(item);
+        SetOfItems.number = 0;
         start.setId(SetOfItems.number++);
         this.states.add(CLOSURE(start));
         int size = 0;
@@ -375,18 +382,18 @@ public class Parse {
             for (int i = 0; i < this.states.size(); i++) {
                 SetOfItems state = this.states.get(i);
                 for (String terminal : this.terminals) {
-                    System.out.println("I"+i+"  "+terminal);
+                    //System.out.println("I"+i+"  "+terminal);
                     SetOfItems nextState = GOTO(state, terminal);
                     if (nextState.getItems().size()!=0 && !this.states.contains(nextState)) {
-                        System.out.println(state);
-                        System.out.println(nextState);
+                        //System.out.println(state);
+                        //System.out.println(nextState);
                         nextState.setId(SetOfItems.number++);
                         this.states.add(nextState);
                         size++;
                     }
                 }
                 for (String non_terminal : this.non_terminals) {
-                    System.out.println("I"+i+"  "+non_terminal);
+                    //System.out.println("I"+i+"  "+non_terminal);
                     SetOfItems nextState = GOTO(state, non_terminal);
                     if (nextState.getItems().size()!=0 && !this.states.contains(nextState)) {
                         nextState.setId(SetOfItems.number++);
@@ -398,7 +405,7 @@ public class Parse {
             if (size > prev)
                 prev = size;
             else{
-                System.out.println(size);
+                //System.out.println(size);
                 break;
             }
         }
@@ -421,18 +428,18 @@ public class Parse {
     private void parserTable(){
         for(int i=0; i<this.states.size(); i++){
             SetOfItems curState = this.states.get(i);
-            System.out.println("I"+curState.getId());
             for(int j=0; j<curState.getItems().size(); j++){
                 Item curItem = curState.getItems().get(j);
                 String curSymbol = curItem.getTmpSymbol();
                 // 第一种情况
-                if((curItem.getDot() < curItem.getProduction().getRight().length) && terminals.contains(curSymbol)) {
+                if((curItem.getDot() < curItem.getProduction().getRight().length) && this.terminals.contains(curSymbol)) {
                     SetOfItems nextState = GOTO(curState, curSymbol);
-                    if(this.states.contains(nextState)) {
+                    int index1;
+                    if((index1 = this.states.indexOf(nextState)) != -1) {
+                        nextState = this.states.get(index1);
                         int index = terminals.indexOf(curSymbol);
                         table[i][index] = "s"+nextState.getId();
                     }
-                    //System.out.println("情况1 " + String.valueOf(i) + "#  " + curSymbol + "s" + nextState.getId());
                 }
                 // 第二种情况
                 if((curItem.getDot() == curItem.getProduction().getRight().length)
@@ -441,26 +448,22 @@ public class Parse {
                     for(String str: rightHand) {
                         int index = this.terminals.indexOf(str);
                         table[i][index] = "r" + curItem.getProduction().getId();
-                        //action.put(String.valueOf(i) + "  " + str, "r" + curItem.getProduction().getId());
-                        //System.out.println("情况2 " + String.valueOf(i) + "#" + str + "  r" + curItem.getProduction().getId());
                     }
                 }
                 // 第三种情况
                 if(curItem.getProduction().getLeft().equals(this.start_unit) && curItem.getDot() == 1){
                     int index = this.terminals.indexOf("$");
                     table[i][index] = "acc";
-                    //action.put(String.valueOf(i) + "  " + "$", "acc");
-                    //System.out.println("情况3 " + String.valueOf(i) + " # " + " $ " + "  acc");
                 }
-
-                // 非终结符
-                if(curItem.getDot() < curItem.getProduction().getRight().length
-                        && this.non_terminals.contains(curSymbol)){
-                    SetOfItems nextState = GOTO(curState, curSymbol);
-                    int index = this.terminals.size() + this.non_terminals.indexOf(curSymbol);
+            }
+            // 第四步
+            for(int j=0; j<this.non_terminals.size(); j++){
+                SetOfItems nextState = GOTO(curState, this.non_terminals.get(j));
+                int index1;
+                if((index1 = this.states.indexOf(nextState)) != -1) {
+                    nextState = this.states.get(index1);
+                    int index = this.terminals.size() + j;
                     table[i][index] = String.valueOf(nextState.getId());
-                    //Goto.put(String.valueOf(i) + "  " + curSymbol, nextState.getId());
-                    //System.out.println("情况4 " + String.valueOf(i) + "#" + curSymbol + nextState.getId());
                 }
             }
         }
@@ -555,18 +558,66 @@ public class Parse {
         return tmpFirstSet;
     }
 
+    // action-shift
+    private void action_shift(int nextState, String curSymbol){
+        this.state_stack.push(nextState);
+        this.symbol_stack.push(curSymbol);
+        System.out.println("移入");
+    }
+
+    // action-reduce
+    private void action_reduce(int curState, int id){
+        Production production = this.productions.get(id);
+        int len = production.getRight().length;
+        String left = production.getLeft();
+        System.out.println("使用产生式 "+ production.toString()+ " 规约");
+        for(int i=0; i<len; i++) {
+            symbol_stack.pop();
+            state_stack.pop();
+        }
+        symbol_stack.push(left);
+        curState = state_stack.peek();
+        int index = this.terminals.size() + this.non_terminals.indexOf(left);
+       // System.out.println(curState + " " + index);
+        int nextState = Integer.parseInt(this.table[curState][index]);
+        state_stack.push(nextState);
+    }
     // LR(1)文法
     public void parser(){
         Scanner scan = new Scanner();
-
-        while(!scan.isEnd()){
-            Token token = scan.token_scan();
-            if(token == null)
-                continue;
-            // 如果token是id
-            //if(token.tag == Code.ID.ordinal()){
-               // Word word = (Word)token;
-           // }
+        this.state_stack.push(0);
+        this.symbol_stack.push(this.start_unit);
+        Token a = scan.token_scan();
+        System.out.println(a.name);
+        while(true) {
+            String curSymbol = a.name;
+            int index = this.terminals.indexOf(curSymbol);
+            int curState = this.state_stack.peek();
+            //System.out.println(curState + "   " + index + "  " + curSymbol);
+            String str;
+            if (index != -1 && (str = this.table[curState][index]) != null) {
+                if (str.charAt(0) == 's') {
+                    StringBuilder sb = new StringBuilder(str);
+                    sb.deleteCharAt(0);
+                    int nextState = Integer.parseInt(sb.toString());
+                    this.state_stack.push(nextState);
+                    this.symbol_stack.push(curSymbol);
+                    a = scan.token_scan();
+                    System.out.println(a.name);
+                    System.out.println("移入"+nextState);
+                }else if (str.charAt(0) == 'r') {
+                    StringBuilder sb = new StringBuilder(str);
+                    sb.deleteCharAt(0);
+                    int id = Integer.parseInt(sb.toString());
+                    this.action_reduce(curState, id);
+                }else if ("acc".equals(str)){
+                    System.out.println("语法分析完成");
+                    break;
+                }
+            }else{
+                System.out.println("语法分析出错！");
+                break;
+            }
         }
     }
 
@@ -659,8 +710,9 @@ public class Parse {
                     pw.print('\t');
             }
             for(int j=0; j<this.non_terminals.size(); j++){
-                if(table[i][j] != null)
-                    pw.print(table[i][j]+'\t');
+                int index = this.terminals.size() + j;
+                if(table[i][index] != null)
+                    pw.print(table[i][index]+'\t');
                 else
                     pw.print('\t');
             }
@@ -676,19 +728,13 @@ public class Parse {
             parse.readIn();
             parse.classify_production();
             parse.makeFirst();
-            SetOfItems start = new SetOfItems();
             parse.start_unit="S1";
-            Production production = new Production("S1 S");
-            ArrayList<String> right = new ArrayList<>();
-            right.add("$");
-            Item item = new Item(production, right, 0);
-            start.add(item);
-            start.setId(SetOfItems.number++);
-            parse.states.add(parse.CLOSURE(start));
+            parse.makeLabel();
             parse.items();
             parse.makeLabel();
             parse.parserTable();
             parse.output();
+            parse.parser();
 //            for(SetOfItems state: parse.states){
 //                for(Item items :state.getItems()){
 //                    if(items.getDot() == items.getProduction().getRight().length)
