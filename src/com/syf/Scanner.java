@@ -21,28 +21,30 @@ public class Scanner {
 		return tail < buffer.size();
 	}
 
-	public Scanner(ArrayList<Character> buffer){
-		this.buffer = buffer;
+	Scanner(){
+		Stdio stdio = new Stdio();
+		stdio.readFile("F:\\123.c");
+		this.buffer = stdio.getBuffer();
 	}
 	
-	public char getchar(){
+	private char getchar(){
 		return buffer.get(tail++).charValue();
 	}
 	
-	public void retract(){
+	private void retract(){
 		this.tail--;
 		this.ch = ' ';
 	}
 	
-	public boolean isAlpha(char ch){
+	private boolean isAlpha(char ch){
 		return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
 	}
 	
-	public boolean isDigit(char ch){
+	private boolean isDigit(char ch){
 		return ch >= '0' && ch <= '9';
 	}
 	
-	public boolean isAlnum(char ch){
+	private boolean isAlnum(char ch){
 		return isAlpha(ch) || isDigit(ch);
 	}
 
@@ -67,7 +69,10 @@ public class Scanner {
 			}
 			retract();
 			String name = sb.toString();
-			return new Word(name);
+			//return new Word(name);
+			if(Code.KEYWORD.contains(name))
+				return new Token(name.toUpperCase());
+			return new Token("IDENTIFIER");
 		}else if(isDigit(ch)){
 			sb.append(ch);
 			ch = getchar();
@@ -84,146 +89,136 @@ public class Scanner {
 				}
 				retract();
 				float num = Float.parseFloat(sb.toString());
-				return new Unsigned_Float(num);
+				//return new Unsigned_Float(num);
+				return new Token("CONSTANT");
 			}
 			retract();
 			int num = Integer.parseInt(sb.toString());
-			return new Unsigned_Int(num);
-		}else 
+			//return new Unsigned_Int(num);
+			return new Token("CONSTANT");
+		}else
 			switch(ch){
 				case '*':sb.append(ch);
-						 ch = getchar();	
-						 if(ch == '*'){
-							 return new Token(Code.EXP.ordinal());
-						 }else if(ch == '='){
-							 return new Token(Code.MULTI_ASSIGN.ordinal());
+						 ch = getchar();
+						 if(ch == '='){
+							 return new Token(Code.OP.get("*="));
 						 }else{
 							 retract();
-							 return new Token(Code.MULTI.ordinal());
+							 return new Token("*");
 						 }
 				case '+':sb.append(ch);
 						 ch = getchar();
 						 if(ch == '+'){
-							 return new Token(Code.INC.ordinal());
+							 return new Token(Code.OP.get("++"));
 						 }else if(ch == '='){
-							 return new Token(Code.ADD_ASSGIN.ordinal());
+							 return new Token(Code.OP.get("+="));
 						 }else{
 							 retract();
-							 return new Token(Code.ADD.ordinal());
+							 return new Token("+");
 						 }
 				case '-':sb.append(ch);
 						 ch = getchar();
 						 if(ch == '-'){
-							 return new Token(Code.DEC.ordinal());
+							 return new Token(Code.OP.get("--"));
 						 }else if(ch == '='){
-							 return new Token(Code.MINUS_ASSIGN.ordinal());
+							 return new Token(Code.OP.get("-="));
 						 }else if(ch == '>'){
-							 return new Token(Code.POINTER.ordinal());
+							 return new Token(Code.OP.get("->"));
 						 }else{
 							 retract();
-							 return new Token(Code.MINUS.ordinal());
+							 return new Token("-");
 						 }
 				case '=':sb.append(ch);
 						 ch = getchar();
 						 if(ch == '='){
-							 return new Token(Code.EQ.ordinal());
+							 return new Token(Code.OP.get("=="));
 						 }else{
 							 retract();
-							 return new Token(Code.ASSIGN.ordinal());
+							 return new Token("=");
 						 }
 				case '>':sb.append(ch);
 						 ch = getchar();
 						 if(ch == '>'){
-							 return new Token(Code.R_SHIFT.ordinal());
+						 	ch = getchar();
+						 	if(ch == '=')
+						 		return new Token(Code.OP.get(">>="));
+						 	retract();
+						 	return new Token(Code.OP.get(">>"));
 						 }else if(ch == '='){
-							 return new Token(Code.GE.ordinal());
+							 return new Token(Code.OP.get(">="));
 						 }else{
 							 retract();
-							 return new Token(Code.GT.ordinal());
+							 return new Token(">");
 						 }
 				case '<':sb.append(ch);
 						 ch = getchar();
-						 if(ch == '>'){
-							 return new Token(Code.NE.ordinal());
-						 }else if(ch == '<'){
-							 return new Token(Code.L_SHIFT.ordinal());
-						 }else if(ch == '='){ 
-							 return new Token(Code.LE.ordinal());
+						 if(ch == '<'){
+						 	ch = getchar();
+						 	if(ch == '=')
+						 		return new Token(Code.OP.get("<<="));
+						 	retract();
+						 	return new Token(Code.OP.get("<<"));
+						 }else if(ch == '='){
+							 return new Token(Code.OP.get("<="));
 						 }else{
 							 retract();
-							 return new Token(Code.LT.ordinal());
+							 return new Token("<");
 						 }
 				case '&':sb.append(ch);
 						 ch = getchar();
-						 if(ch == '&'){
-							 // && 
-							return new Token(Code.ANDAND.ordinal());
-						 }
+						 if(ch == '&')
+							return new Token(Code.OP.get("&&"));
+						 if(ch == '=')
+						 	return new Token(Code.OP.get("&="));
 						 retract();
-						 return new Token(Code.AND.ordinal());
+						 return new Token("&");
 				case '|':sb.append(ch);
 						 ch = getchar();
-						 if(ch == '|'){
-							 // ||
-							 return new Token(Code.OROR.ordinal());
-						 }
+						 if(ch == '|')
+						 	return new Token(Code.OP.get("||"));
+						 if(ch == '=')
+						 	return new Token(Code.OP.get("|="));
 						 retract();
-						 return new Token(Code.OR.ordinal());
+						 return new Token("|");
 				case '(':sb.append(ch);
-						 return new Token(Code.L_BRACKET.ordinal());
+						 return new Token("(");
 				case ')':sb.append(ch);
-						 return new Token(Code.R_BRACKET.ordinal());
+						 return new Token(")");
 				case '{':sb.append(ch);
-						 return new Token(Code.L_BRACE.ordinal());
+						 return new Token("{");
 				case '}':sb.append(ch);
-						 return new Token(Code.R_BRACE.ordinal());
+						 return new Token("}");
 				case '/':sb.append(ch);
 						 ch = getchar();
 						 if(ch == '='){
-							 return new Token(Code.DIV_ASSIGN.ordinal());
-						 }else if(ch == '/'){
-							 ch = getchar();
-							 while(ch != '\n')
+							 return new Token(Code.OP.get("/="));
+						 }else if(ch == '*') {
+							 char ch1;
+							 Loop:while (true) {
 								 ch = getchar();
-							 return null;
-						 }else if(ch == '*'){
-						 	while(true){
-						 		ch = getchar();
-						 		while(ch != '*')
-									ch = getchar();
-						 		ch = getchar();
-						 		if(ch == '/')
-						 			return null;
+								 while (ch != '*')
+									 ch = getchar();
+								 ch1 = getchar();
+								 if (ch1 != '/') {
+									 retract();
+									 break Loop;
+								 }
+								 return null;
 							 }
 						 }else {
 							 retract();
-							 return new Token(Code.DIV.ordinal());
+							 return new Token("\\");
 						 }
-				case '#':sb.append(ch);
-						 ch = getchar();
-						 while(ch != '\n')
-						 	ch = getchar();
-						 return null;
 				case ',':sb.append(ch);
-						 return new Token(Code.COMMA.ordinal());
+						 return new Token(",");
 				case ':':sb.append(ch);
-						 ch = getchar();
-						 if(ch == '='){
-							 return new Token(Code.ASSIGN.ordinal());
-						 }break;
+						 return new Token(":");
 				case ';':sb.append(ch);
-						 return new Token(Code.SEMIC.ordinal());
+						 return new Token(";");
 				case '!':sb.append(ch);
-						 return new Token(Code.NOT.ordinal());
+						 return new Token("!");
 				case '"':sb.append(ch);
-						 ch = getchar();
-						 while(ch != '"'){
-							 sb.append(ch);
-							 ch = getchar();
-						 }
-						 sb.append(ch);
-						 String lexme = sb.toString();
-						 return new Const_String(lexme);
+						 return new Token("\"");
 			}
 			return null;
 	}

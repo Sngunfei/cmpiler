@@ -6,11 +6,11 @@ import java.util.ArrayList;
 public class Main {
 
     public static void main(String[] args) {
-        ArrayList<String> a = new ArrayList<>();
-        a.add("1");
-        a.add("2");
-        System.out.println(a.toString());
-
+        String str = "I1:IDENTIFIER";
+        String str2 = "I1:IDENTIFIER";
+        System.out.println(str.hashCode());
+        System.out.println(str2.hashCode());
+        System.out.println("I1:IDENTIFIER".hashCode());
 
     }
 }

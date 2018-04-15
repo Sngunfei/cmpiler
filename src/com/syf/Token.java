@@ -10,6 +10,11 @@ package com.syf;
 */
 
 public class Token {
-	public final int tag;
+	public int tag;
+	public String name;
 	public Token(int t){ this.tag = t; }
+	public Token(String name){
+		this.name = name;
+	}
+	public Token(){}
 }

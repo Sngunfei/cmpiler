@@ -1,5 +1,10 @@
 package com.syf;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
 * @file Code.java
 * @CopyRight (C) https://github.com/Sngunfei
@@ -9,22 +14,71 @@ package com.syf;
 * @date 2018-3-31
 */
 
-public enum Code{
-	ID,   // 标识符类
-    STRING, // 字符串常量
-    UNSIGNED_INT, // 无符号整数
-    UNSIGNED_FLOAT, // 无符号浮点数
+public class Code{
 
-    // C语言32个关键字
-	MAIN, VOLATILE, STRUCT, TYPEDEF, UNION, AUTO, EXTERN, UNSIGNED, SIGNED, STATIC, SIZEOF,
-	CONST, ENUM, CHAR, LONG, FLOAT, DOUBLE, SHORT, INT, DEFAULT, CASE, SWITCH, CONTINUE, BREAK,
-	GOTO, ELSE, IF, VOID, RETURN, DO, WHILE, FOR,
+    public static ArrayList<String> IDENTIFIER = new ArrayList<>();
+    public static ArrayList<String> CONSTANT = new ArrayList<>();
+    public static ArrayList<String> STRING_LITERAL = new ArrayList<>();
+    public static ArrayList<String> KEYWORD = new ArrayList<>(35);
+    public static HashMap<String, String> OP = new HashMap<>();
 
-    // 运算符
-	ADD, MINUS, INC, DEC, MULTI, DIV, MOD, MOD_ASSIGN, ADD_ASSGIN, MINUS_ASSIGN, DIV_ASSIGN, MULTI_ASSIGN,
-    EQ, NE, GT, LT, GE, LE, ASSIGN, POINTER, L_SHIFT, R_SHIFT, EXP, AND, OR, NOT, ANDAND, OROR,
+    // 32个关键字
+    static{
+        KEYWORD.add("volatile");
+        KEYWORD.add("struct");
+        KEYWORD.add("typedef");
+        KEYWORD.add("union");
+        KEYWORD.add("auto");
+        KEYWORD.add("extern");
+        KEYWORD.add("unsigned");
+        KEYWORD.add("signed");
+        KEYWORD.add("static");
+        KEYWORD.add("sizeof");
+        KEYWORD.add("const");
+        KEYWORD.add("enum");
+        KEYWORD.add("char");
+        KEYWORD.add("long");
+        KEYWORD.add("float");
+        KEYWORD.add("double");
+        KEYWORD.add("short");
+        KEYWORD.add("int");
+        KEYWORD.add("default");
+        KEYWORD.add("case");
+        KEYWORD.add("switch");
+        KEYWORD.add("continue");
+        KEYWORD.add("break");
+        KEYWORD.add("goto");
+        KEYWORD.add("else");
+        KEYWORD.add("if");
+        KEYWORD.add("void");
+        KEYWORD.add("return");
+        KEYWORD.add("do");
+        KEYWORD.add("while");
+        KEYWORD.add("for");
+        KEYWORD.add("rigister");
 
-    // 分界符
-    L_BRACKET, R_BRACKET, L_BRACE, R_BRACE,
-	SEMIC,COLON,DOT,COMMA
+        OP.put(">>=", "RIGHT_ASSIGN");
+        OP.put("<<=", "LEFT_ASSIGN");
+        OP.put("+=", "ADD_ASSIGN");
+        OP.put("-=", "SUB_ASSIGN");
+        OP.put("*=", "MUL_ASSIGN");
+        OP.put("/=", "DIV_ASSIGN");
+        OP.put("%=", "MOD_ASSIGN");
+        OP.put("&=", "AND_ASSIGN");
+        OP.put("^=", "XOR_ASSIGN");
+        OP.put("|=", "OR_ASSIGN");
+        OP.put(">>", "RIGHT_OP");
+        OP.put("<<", "LEFT_OP");
+        OP.put("++", "INC_OP");
+        OP.put("--", "DEC_OP");
+        OP.put("->", "PTR_OP");
+        OP.put("&&", "AND_OP");
+        OP.put("||", "OR_OP");
+        OP.put("<=", "LE_OP");
+        OP.put(">=", "GE_OP");
+        OP.put("==", "EQ_OP");
+        OP.put("!=", "NE_OP");
+
+    }
+
 }
