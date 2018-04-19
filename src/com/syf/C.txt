@@ -209,4 +209,3 @@ function_definition declaration_specifiers declarator declaration_list compound_
 function_definition declaration_specifiers declarator compound_statement
 function_definition declarator declaration_list compound_statement
 function_definition declarator compound_statement
-s translation_unit

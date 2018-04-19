@@ -52,7 +52,6 @@ public class Stdio {
 		Stdio test = new Stdio();
 		String filename = "F:\\123.c";
 		test.readFile(filename);
-
 	}
 
 }

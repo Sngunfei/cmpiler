@@ -23,7 +23,7 @@ public class Scanner {
 
 	Scanner(){
 		Stdio stdio = new Stdio();
-		stdio.readFile("F:\\123.txt");
+		stdio.readFile("C:\\Users\\86234\\workspace\\FirstProj\\src\\com\\syf\\program.txt");
 		this.buffer = stdio.getBuffer();
 		this.tail = 0;
 	}
@@ -74,6 +74,7 @@ public class Scanner {
 			if(Code.KEYWORD.contains(name))
 				return new Token(name.toUpperCase());
 			return new Token(name);
+			//return new Token("IDENTIFIER");
 		}else if(isDigit(ch)){
 			sb.append(ch);
 			ch = getchar();

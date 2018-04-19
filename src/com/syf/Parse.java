@@ -219,14 +219,14 @@ public class Parse {
 
     private String[][] table = new String[2000][200];
 
-    public String start_unit = "s1";
+    public String start_unit;
+    public Production start_production;
 
     /*
-     * read all productions from "Production_table.txt"
+     * read all productions from "C.txt.txt"
      * store production and identify terminals and non_terminals
      */
     private void readIn() throws IOException {
-        //File file = new File("C:\\Users\\86234\\workspace\\FirstProj\\src\\com\\syf\\Production_table");
         File file = new File("C:\\Users\\86234\\workspace\\FirstProj\\src\\com\\syf\\sample2");
         BufferedReader in = new BufferedReader(
                                 new InputStreamReader(
@@ -237,19 +237,15 @@ public class Parse {
             String[] production = line.split(" ");
             for(int i=0; i<production.length; i++){
                 if(Character.isLetter(production[i].charAt(0)) && Character.isUpperCase(production[i].charAt(0))){
-                    if(!this.non_terminals.contains(production[i])) {
+                    if(!this.non_terminals.contains(production[i]))
                         this.non_terminals.add(production[i]);
-                        //System.out.println(production[i]);
-                    }
                 }else{
-                    if(!this.terminals.contains(production[i])) {
+                    if(!this.terminals.contains(production[i]))
                         this.terminals.add(production[i]);
-                        //System.out.println(production[i]);
-                    }
                 }
             }
         }
-        this.productions.add(new Production("S1 E"));
+        this.productions.add(this.start_production);
         this.terminals.add("$");
         in.close();
         this.productions.trimToSize();
@@ -275,7 +271,6 @@ public class Parse {
     // 搜索某个非终结符的所有产生式
     private ArrayList<Production> getProductionBySymbol(String non_terminal){
         if(!classified_production.containsKey(non_terminal)){
-            //System.out.println("该非终结符不存在！");
             return null;
         }
         return classified_production.get(non_terminal);
@@ -349,10 +344,8 @@ public class Parse {
             int dot = item.getDot();
             if(dot == prod.getRight().length)
                 continue;
-            //System.out.println(X + " " + item.getTmpSymbol());
             if(X.equals(item.getTmpSymbol())){
                 Item newItem = new Item(prod, item.getRightHand(), dot+1);
-                //System.out.println(newItem.toString());
                 J.add(newItem);
             }
         }
@@ -366,34 +359,28 @@ public class Parse {
      */
     private void items(){
         SetOfItems start = new SetOfItems();
-        Production production = new Production("S1 E");
         ArrayList<String> right = new ArrayList<>();
         right.add("$");
-        Item item = new Item(production, right, 0);
+        Item item = new Item(this.start_production, right, 0);
         start.add(item);
         SetOfItems.number = 0;
         start.setId(SetOfItems.number++);
         this.states.add(CLOSURE(start));
         int size = 0;
         int prev = 0;
-//        int flag = 0;
+        int flag = 0;
         while(true) {
-//            System.out.println(flag);
             for (int i = 0; i < this.states.size(); i++) {
                 SetOfItems state = this.states.get(i);
                 for (String terminal : this.terminals) {
-                    //System.out.println("I"+i+"  "+terminal);
                     SetOfItems nextState = GOTO(state, terminal);
                     if (nextState.getItems().size()!=0 && !this.states.contains(nextState)) {
-                        //System.out.println(state);
-                        //System.out.println(nextState);
                         nextState.setId(SetOfItems.number++);
                         this.states.add(nextState);
                         size++;
                     }
                 }
                 for (String non_terminal : this.non_terminals) {
-                    //System.out.println("I"+i+"  "+non_terminal);
                     SetOfItems nextState = GOTO(state, non_terminal);
                     if (nextState.getItems().size()!=0 && !this.states.contains(nextState)) {
                         nextState.setId(SetOfItems.number++);
@@ -404,10 +391,8 @@ public class Parse {
             }
             if (size > prev)
                 prev = size;
-            else{
-                //System.out.println(size);
+            else
                 break;
-            }
         }
     }
 
@@ -501,8 +486,10 @@ public class Parse {
             for (String non_terminal : this.non_terminals) {
                 if (this.firstSet.containsKey(non_terminal))
                     SymbolFirstSet = this.firstSet.get(non_terminal);
-                else
+                else {
                     SymbolFirstSet = new ArrayList<>(MAX_LENGTH);
+                    this.firstSet.put(non_terminal, SymbolFirstSet);
+                }
                 ArrayList<Production> SymbolProductions = getProductionBySymbol(non_terminal);
                 if(SymbolProductions == null)
                     continue;
@@ -511,6 +498,7 @@ public class Parse {
                     Collections.addAll(right, SymbolProduction.getRight());
                     //System.out.println(right.toString());
                     ArrayList<String> tmpFirstSet = this.getFirst(right);
+                    if(tmpFirstSet == null) break;
                     for(String str: tmpFirstSet){
                         if(!SymbolFirstSet.contains(str)){
                             SymbolFirstSet.add(str);
@@ -529,10 +517,8 @@ public class Parse {
 
     // 查找某个符号的first集
     private ArrayList<String> getFirst(String symbol){
-        if(!firstSet.containsKey(symbol)){
-            //System.out.println("该符号不存在！");
+        if(!firstSet.containsKey(symbol))
             return null;
-        }
         return firstSet.get(symbol);
     }
 
@@ -541,6 +527,8 @@ public class Parse {
         ArrayList<String> tmpFirstSet = new ArrayList<>(MAX_LENGTH);
         int cnt = 0;
         for(String rightHand: right){
+            if(!this.firstSet.containsKey(rightHand))
+                return null;
             ArrayList<String> tmp = getFirst(rightHand);
             if(tmp == null)
                 continue;
@@ -582,6 +570,7 @@ public class Parse {
         int nextState = Integer.parseInt(this.table[curState][index]);
         state_stack.push(nextState);
     }
+
     // LR(1)文法
     public void parser(){
         Scanner scan = new Scanner();
@@ -637,7 +626,7 @@ public class Parse {
 
     // 输出符号
     private void outputSymbol() throws IOException{
-        File file = new File("F:\\symbols.txt");
+        File file = new File("C:\\Users\\86234\\workspace\\FirstProj\\src\\com\\syf\\symbols.txt");
         PrintWriter pw = new PrintWriter(file);
         pw.println(this.terminals.size()+" terminals");
         for(int i=0; i<this.terminals.size(); i++)
@@ -651,7 +640,7 @@ public class Parse {
 
     // 输出符号的first集
     private void outputFirst() throws IOException{
-        File file = new File("F:\\first.txt");
+        File file = new File("C:\\Users\\86234\\workspace\\FirstProj\\src\\com\\syf\\first.txt");
         PrintWriter pw = new PrintWriter(file);
         ArrayList<String> first;
         for (String terminal : this.terminals) {
@@ -668,7 +657,7 @@ public class Parse {
 
     // output all productions
     private void outputProductions() throws IOException{
-        File file = new File("F:\\Productions.txt");
+        File file = new File("C:\\Users\\86234\\workspace\\FirstProj\\src\\com\\syf\\Productions.txt");
         PrintWriter pw = new PrintWriter(file);
         for(int i=0; i<this.productions.size(); i++){
             Production p = this.productions.get(i);
@@ -680,7 +669,7 @@ public class Parse {
 
     // 输出所有状态
     private void outputStates() throws IOException{
-        File file = new File("F:\\states.txt");
+        File file = new File("C:\\Users\\86234\\workspace\\FirstProj\\src\\com\\syf\\states.txt");
         PrintWriter pw = new PrintWriter(file);
         for(SetOfItems setOfItems: this.states){
             pw.println(setOfItems.toString());
@@ -691,7 +680,7 @@ public class Parse {
 
     // 输出action和goto表
     private void outTable() throws IOException{
-        File file = new File("F:\\table.txt");
+        File file = new File("C:\\Users\\86234\\workspace\\FirstProj\\src\\com\\syf\\table.txt");
         PrintWriter pw = new PrintWriter(file);
         pw.print('\t');
         for (String terminal : this.terminals) {
@@ -725,25 +714,25 @@ public class Parse {
 	public static void main(String[] args) {
         Parse parse = new Parse();
         try {
-            parse.readIn();
-            parse.classify_production();
-            parse.makeFirst();
             parse.start_unit="S1";
+            parse.start_production = new Production("S1 E");
+
+            parse.readIn();
+            parse.outputSymbol();
+            parse.classify_production();
+
+            parse.makeFirst();
             parse.makeLabel();
+            System.out.println("1");
+
             parse.items();
+            System.out.println("2");
             parse.makeLabel();
             parse.parserTable();
+            System.out.println("3");
             parse.output();
             parse.parser();
-//            for(SetOfItems state: parse.states){
-//                for(Item items :state.getItems()){
-//                    if(items.getDot() == items.getProduction().getRight().length)
-//                        System.out.println(items.toString());
-//                }
-//            }
-           // parse.items();
-            //System.out.println(parse.states.size());
-            //parse.outputStates();
+            System.out.println("4");
         }catch (IOException e){
             e.printStackTrace();
         }
