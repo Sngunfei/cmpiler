@@ -4,7 +4,7 @@ import java.lang.StringBuilder;
 
 /**
 * @file Scanner.java
-* @CopyRight (C) https://github.com/Sngunfei
+* @CopyRight (C.txt) https://github.com/Sngunfei
 * @brief
 * @author syfnico
 * @email syfnico@foxmail.com
@@ -25,6 +25,7 @@ public class Scanner {
 		Stdio stdio = new Stdio();
 		stdio.readFile("C:\\Users\\86234\\workspace\\FirstProj\\src\\com\\syf\\program.txt");
 		this.buffer = stdio.getBuffer();
+		this.buffer.trimToSize();
 		this.tail = 0;
 	}
 	
@@ -52,16 +53,12 @@ public class Scanner {
 	public Token token_scan(){
 		StringBuilder sb = new StringBuilder();
 		if(tail == buffer.size())
-			return new Token("$");
+			return new Token("#");
 		ch = getchar();
-		if(tail == buffer.size())
-			return new Token("$");
 		while(ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r'){
 			ch = getchar();
-			if(tail == buffer.size())
-				return new Token("$");
 		}
-		if(isAlpha(ch)){
+		if(tail <= buffer.size() && isAlpha(ch)){
 			sb.append(ch);
 			ch = getchar();
 			while(isAlnum(ch)){
@@ -73,8 +70,8 @@ public class Scanner {
 			//return new Word(name);
 			if(Code.KEYWORD.contains(name))
 				return new Token(name.toUpperCase());
-			return new Token(name);
-			//return new Token("IDENTIFIER");
+			//return new Token(name);
+			return new Token("ID");
 		}else if(isDigit(ch)){
 			sb.append(ch);
 			ch = getchar();
@@ -92,12 +89,12 @@ public class Scanner {
 				retract();
 				float num = Float.parseFloat(sb.toString());
 				//return new Unsigned_Float(num);
-				return new Token("CONSTANT");
+				return new Token("REAL");
 			}
 			retract();
 			int num = Integer.parseInt(sb.toString());
 			//return new Unsigned_Int(num);
-			return new Token("CONSTANT");
+			return new Token("NUM");
 		}else
 			switch(ch){
 				case '*':sb.append(ch);
@@ -138,6 +135,8 @@ public class Scanner {
 							 retract();
 							 return new Token("=");
 						 }
+				case '%':sb.append(ch);
+						 return new Token("%");
 				case '>':sb.append(ch);
 						 ch = getchar();
 						 if(ch == '>'){
@@ -186,6 +185,10 @@ public class Scanner {
 						 return new Token("(");
 				case ')':sb.append(ch);
 						 return new Token(")");
+				case '[':sb.append(ch);
+				 	     return new Token("[");
+				case ']':sb.append(ch);
+						 return new Token("]");
 				case '{':sb.append(ch);
 						 return new Token("{");
 				case '}':sb.append(ch);

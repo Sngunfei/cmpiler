@@ -7,7 +7,7 @@ import java.util.Set;
 
 /**
 * @file Code.java
-* @CopyRight (C) https://github.com/Sngunfei
+* @CopyRight (C.txt) https://github.com/Sngunfei
 * @brief
 * @author syfnico
 * @email syfnico@foxmail.com

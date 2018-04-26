@@ -4,7 +4,7 @@ import java.util.*;
 
 /**
 * @file Stdio.java
-* @CopyRight (C) https://github.com/Sngunfei
+* @CopyRight (C.txt) https://github.com/Sngunfei
 * @author syfnico
 * @email syfnico@foxmail.com
 * @date 2018-3-31
