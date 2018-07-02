@@ -187,6 +187,8 @@ public class Parse {
     private String startSymbol = "program";
     private String endSymbol = "#";
 
+    private Semantic semantic;
+
     /*
      * read all productions from "Production_table.txt"
      * store production and identify terminals and non_terminals
@@ -525,6 +527,7 @@ public class Parse {
     }
 
     // action-reduce
+    // 调用语义子程序的位置
     private void action_reduce(int curState, int id){
         Production production = this.productions.get(id);
         int len = production.getRight().length;
@@ -540,6 +543,9 @@ public class Parse {
         // System.out.println(curState + " " + index);
         int nextState = Integer.parseInt(this.table[curState][index]);
         state_stack.push(nextState);
+
+        index = production.getId();
+
     }
 
     // LR(1)文法
@@ -688,6 +694,7 @@ public class Parse {
 	public static void main(String[] args) {
         Parse parse = new Parse();
         try {
+            parse.semantic = new Semantic();
             parse.readIn();
             parse.classify_production();
             parse.outputSymbol();
