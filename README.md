@@ -1,7 +1,3 @@
 # compiler
-C语言编译器
-
-### 2018-03-29 完成词法分析器
-
-### 2018-04-04 肝语法分析器
+A compiler for C written by Java.
     
